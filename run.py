@@ -1,6 +1,9 @@
-from functions import *
+from Video import Video
 
-createOutFolder()
-extarctImageFromVid("test")
-cropImage(0, 0, 100, 400, 'hey', FULL_PATH_OUT_EXTRACT_IMAGES)
-extractText()
+#cropImage(0, 0, 100, 400, 'hey', FULL_PATH_OUT_EXTRACT_IMAGES)
+#extractText()
+
+v = Video("test.mp4")
+v.createFolders()
+v.extractFrames()
+print(v.toString())
