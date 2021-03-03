@@ -1,5 +1,5 @@
 from headers import WORKING_DIRECTORY_NAME
-from functions import splitExtensionFile, extractFrameFromVid, createFoldersForVideo, getNumberOfFrames, getDurationVideo, getVidDimensions
+from functions import splitExtensionFile, extractFrameFromVid, createFoldersForVideo, getNumberOfFrames, getDurationVideo, getVidDimensions, processOCR, framesCleaning
 
 class Video:
 
@@ -32,9 +32,15 @@ class Video:
     
     def getFPS(self):
         return self.fps
+
+    def getNbFrames(self):
+        return self.nbFrames
     
     def getFrames(self):
         return self.frames
+
+    def getDimensions(self):
+        return self.dimensions
 
     def getWorkDir(self):
         return self.workDir
@@ -42,17 +48,29 @@ class Video:
     def addFrame(self, frame):
         self.frames.append(frame)
     
+    def setFrames(self, frames):
+        self.frames = frames
+    
     def setDuration(self, duration):
         self.duration = duration
     
     def setFPS(self):
         self.fps = float(self.nbFrames/self.duration)
+    
+    def setNbFrames(self, nbFrames):
+        self.nbFrames = nbFrames
 
     def createFolders(self):
         createFoldersForVideo(self)
     
     def extractFrames(self):
         extractFrameFromVid(self)
+    
+    def cleanFrames(self):
+        framesCleaning(self)
+
+    def processFrames(self):
+        processOCR(self)
 
     def toString(self):
         return '''
@@ -64,9 +82,9 @@ class Video:
 # Ext : \t\t{ext}
 # Frames : \t\t{lengthFrames} 
 # Extracted Frames : \t{lengthExtractedFrames}
-# Dimensions : \t\t{dimensions}
+# Dimensions : \t\t{width}x{height}
 # Duration : \t\t{duration}
 # FPS : \t\t{fps}
 # Working Dir : \t{workDir}
 #####################################################
-'''.format(name=self.name, nameWithoutExt=self.nameWithoutExt, ext=self.ext, lengthFrames=self.nbFrames, lengthExtractedFrames=len(self.frames), dimensions=self.dimensions, duration=self.duration, fps=self.fps, workDir=self.workDir)
+'''.format(name=self.name, nameWithoutExt=self.nameWithoutExt, ext=self.ext, lengthFrames=self.nbFrames, lengthExtractedFrames=len(self.frames), width=self.dimensions['width'], height=self.dimensions['height'], duration=self.duration, fps=self.fps, workDir=self.workDir)

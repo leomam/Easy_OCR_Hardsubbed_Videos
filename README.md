@@ -9,6 +9,7 @@ $ sudo pacman -S tesseract tesseract-data-fra tesseract-data-eng
 ```shell
 $ pip install opencv-python
 $ pip install pytesseract
+$ pip install srt
 ```
 
 ## Usage
