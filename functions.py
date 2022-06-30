@@ -49,7 +49,7 @@ def extractFrameFromVid(video):
             ret, frame = cap.read()
             if ret == False:
                 break
-            if rate > 2000:
+            if rate > VIDEO_EXTRACT_RATE_EVERY_FRAME:
                 frame = cropImage(int(video.getDimensions()['width']*0.02), int(video.getDimensions()['height']*0.8), int(video.getDimensions()['height']*0.2), int(video.getDimensions()['width']-(video.getDimensions()['width']*0.02)), frame)
                 cv2.imwrite(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES + '/' + str(i) + '.png', frame)
                 video.addFrame(str(i) + '.png')
@@ -149,7 +149,7 @@ def imagePerTime(fps, imageNum):
 ##############################
 
 def checkExtractedFile(video):
-    allFrames = os.listdir(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES_CLEAN)
+    allFrames = os.listdir(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES)
     video.setNbFrames(len(allFrames))
     video.setFrames(allFrames)
 
@@ -162,9 +162,9 @@ def processOCR(video):
         startDialogueTime = 0
         endDialogueTime = 0
         it = 0
-        checkExtractedFile(video)
+        checkExtractedFile(video) #not the clean one (need to be redone)
         for i in range (video.getNbFrames()):
-            dialogue = pytesseract.image_to_string(Image.open(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES_CLEAN + '/' + video.getFrames()[i]), config=r'--oem 3 --psm 6', lang='fra')
+            dialogue = pytesseract.image_to_string(Image.open(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES_CLEAN + '/' + video.getFrames()[i]), config=r'--oem 3 --psm 6', lang= HARDSUB_LANGUAGE)
             print(dialogue)
             if dialogue == previousDialogue:
                 endDialogueTime = imagePerTime(video.getFPS(), i+1)
@@ -173,9 +173,9 @@ def processOCR(video):
                 startDialogueTime = imagePerTime(video.getFPS(), i+1)
                 previousDialogue = dialogue
                 srtSave({'dialogue': dialogue, 'startDialogueTime': startDialogueTime, 'endDialogueTime':endDialogueTime}, it)
-        #allDialogueTime.append({'dialogue': dialogue, 'startDialogueTime': startDialogueTime, 'endDialogueTime':endDialogueTime})
+            allDialogueTime.append({'dialogue': dialogue, 'startDialogueTime': startDialogueTime, 'endDialogueTime':endDialogueTime})
         
-        #print(allDialogueTime)
+        print(allDialogueTime)
     else :
         print('Error: You should create folders before extract something in it !')
 
