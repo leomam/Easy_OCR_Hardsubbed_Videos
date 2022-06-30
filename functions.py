@@ -157,7 +157,7 @@ def processOCR(video):
         it = 0
         checkExtractedFile(video)
         for i in range (video.getNbFrames()):
-            dialogue = pytesseract.image_to_string(Image.open(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES_CLEAN + '/' + video.getFrames()[i]), lang='fra')
+            dialogue = pytesseract.image_to_string(Image.open(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES_CLEAN + '/' + video.getFrames()[i]), config=r'--oem 3 --psm 6', lang='fra')
             print(dialogue)
             if dialogue == previousDialogue:
                 endDialogueTime = imagePerTime(video.getFPS(), i+1)
