@@ -3,21 +3,18 @@ An easy way to retrieve subs or text in a video (currently in early stage)
 
 ## Install Linux Manjaro
 ```shell
-$ sudo pacman -Syu
-$ sudo pacman -S tesseract tesseract-data-eng tesseract-data-fra
+$ sudo pacman -Syu --noconfirm && sudo pacman -S tesseract tesseract-data-eng tesseract-data-fra tesseract-data-spa tesseract-data-ita tesseract-data-jpn --noconfirm
 ```
 
 ## Install Linux Kali
 ```shell
 $ sudo apt update -y && sudo apt upgrade -y
-$ sudo apt install tesseract-ocr python3-pil tesseract-ocr-eng tesseract-ocr-fra
+$ sudo apt install tesseract-ocr python3-pil tesseract-data-eng tesseract-data-fra tesseract-data-spa tesseract-data-ita tesseract-data-jpn
 ```
 
 ## In your Terminal
 ```shell
-$ pip install opencv-python
-$ pip install pytesseract
-$ pip install srt
+$ pip install opencv-python pytesseract srt
 ```
 
 ## Usage
