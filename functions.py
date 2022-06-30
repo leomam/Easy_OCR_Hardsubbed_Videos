@@ -82,7 +82,14 @@ def createFoldersForVideo(video):
         else :
             print('Warning : the folder \"' + video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES + '\" already exist, you shouldn\'t extract frames in there !')
     except OSError: 
-        print ('Error: Creating directory ' + video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES) 
+        print ('Error: Creating directory ' + video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES)
+    try:
+        if not os.path.exists(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES_CLEAN): 
+            os.makedirs(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES_CLEAN)
+        else :
+            print('Warning : the folder \"' + video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES_CLEAN + '\" already exist, you shouldn\'t extract frames in there !')
+    except OSError: 
+        print ('Error: Creating directory ' + video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES_CLEAN)
 #########################
 
 ##### SRT #####
