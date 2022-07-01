@@ -64,12 +64,13 @@ def extractFrameFromVid(video):
                 frame = cropImage(int(video.getDimensions()['width']*0.02), int(video.getDimensions()['height']*0.8), int(video.getDimensions()['height']*0.2), int(video.getDimensions()['width']-(video.getDimensions()['width']*0.02)), frame)
                 cv2.imwrite(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES + '/' + str(i) + '.png', frame)
                 video.addFrame(str(i) + '.png')
-                print(str(i) + "/" + str(video.getNbFrames()))
+                print(str(i) + "/" + str(video.getNbFrames()), end="\r")
                 rate=0
             i+=1
             rate+=1
         cap.release()
         cv2.destroyAllWindows()
+        print()
     else :
         print('Error: You should create folders before extract something in it !')
 #####################################
@@ -201,8 +202,9 @@ def processOCR(video):
                 previousDialogue = dialogue
                 srtSave({'dialogue': dialogue, 'startDialogueTime': startDialogueTime, 'endDialogueTime':endDialogueTime}, it)
             allDialogueTime.append({'dialogue': dialogue, 'startDialogueTime': startDialogueTime, 'endDialogueTime':endDialogueTime})
-        
-        print(allDialogueTime)
+            print(str(i) + "/" + str(video.getNbFrames()), end="\r")
+        print()
+        #print(allDialogueTime)
     else :
         print('Error: You should create folders before extract something in it !')
 
@@ -248,5 +250,8 @@ def apply_brightness_contrast(input_img, brightness = 0, contrast = 0):
 
 def framesCleaning(video):
     checkExtractedFile(video)
+    print("Frame Cleaning")
     for i in range (video.getNbFrames()):
+        print(str(i) + "/" + str(video.getNbFrames()), end="\r")
         frameCleaning(video.getWorkDir(), cv2.imread(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES + '/' + video.getFrames()[i]), video.getFrames()[i])
+    print()
