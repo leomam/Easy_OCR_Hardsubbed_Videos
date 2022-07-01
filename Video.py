@@ -1,12 +1,12 @@
-from headers import WORKING_DIRECTORY_NAME
-from functions import splitExtensionFile, extractFrameFromVid, createFoldersForVideo, getNumberOfFrames, getDurationVideo, getVidDimensions, processOCR, framesCleaning
+from headers import WORKING_DIRECTORY_NAME, VIDEO_PATH
+from functions import verifIfPathExist, splitExtensionFile, extractFrameFromVid, createFoldersForVideo, getNumberOfFrames, getDurationVideo, getVidDimensions, processOCR, framesCleaning
 
 class Video:
 
     def __init__(self, name):
         self.name = name
         self.nameWithoutExt = splitExtensionFile(self.name)[0]
-        self.path = name
+        self.path = verifIfPathExist(self.name)
         self.ext = splitExtensionFile(self.name)[1]
         self.frames = []
         self.nbFrames = getNumberOfFrames(self.path)

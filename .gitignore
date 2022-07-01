@@ -2,7 +2,10 @@
 __pycache__
 
 # Working Directories
-working_directory
+working_directory/
 
 # Visual Studio Code
 .vscode/
+
+# Video Files
+Files/

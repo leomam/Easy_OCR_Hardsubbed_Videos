@@ -12,6 +12,17 @@ from headers import *
 
 ################
 
+##### Verif if Video Path Exist #####
+
+def verifIfPathExist(file):
+    if os.path.exists(file):
+        return file
+    else:
+        print("Error file " + file + " don't exist")
+        exit()
+
+#####################################
+
 ##### Split Video Name and Extension #####
 def verifIfExtensionExist(file):
     i = 0
@@ -49,10 +60,11 @@ def extractFrameFromVid(video):
             ret, frame = cap.read()
             if ret == False:
                 break
-            if rate > VIDEO_EXTRACT_RATE_EVERY_FRAME:
+            if rate >= VIDEO_EXTRACT_RATE_EVERY_FRAME:
                 frame = cropImage(int(video.getDimensions()['width']*0.02), int(video.getDimensions()['height']*0.8), int(video.getDimensions()['height']*0.2), int(video.getDimensions()['width']-(video.getDimensions()['width']*0.02)), frame)
                 cv2.imwrite(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES + '/' + str(i) + '.png', frame)
                 video.addFrame(str(i) + '.png')
+                print(str(i) + "/" + str(video.getNbFrames()))
                 rate=0
             i+=1
             rate+=1
@@ -62,7 +74,7 @@ def extractFrameFromVid(video):
         print('Error: You should create folders before extract something in it !')
 #####################################
 
-##### Creat Folders #####
+##### Create Folders #####
 def createFoldersForVideo(video):
     try:
         if not os.path.exists(WORKING_DIRECTORY_NAME): 
@@ -103,8 +115,9 @@ def srtSave(dialogueTime, it):
         file = open('read.srt', 'w')
     else:
         file = open('read.srt', 'a')
-    file.write(srtTemplate) 
-    file.close()
+    if dialogueTime['dialogue'] != "":
+        file.write(srtTemplate) 
+        file.close()
 
 def formatTime(time):
     hours = 0
@@ -131,11 +144,16 @@ def getDurationVideo(pathOfTheVideoFile):
                              "default=noprint_wrappers=1:nokey=1", pathOfTheVideoFile],
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT)
-    return float(result.stdout)
+    try:
+        return float(result.stdout)
+    except ValueError as ve:
+        print(ve)
+        print("Please check the extention and the path of the file : " + str(pathOfTheVideoFile))
+        exit()
 
 def getNumberOfFrames(pathOfTheVideoFile):
     cap = cv2.VideoCapture(pathOfTheVideoFile)
-    totalframecount= int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    totalframecount = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
     return totalframecount
 
 def getVidDimensions(pathOfTheVideoFile):
@@ -153,6 +171,12 @@ def checkExtractedFile(video):
     video.setNbFrames(len(allFrames))
     video.setFrames(allFrames)
 
+def checkExtractedFileCleaned(video):
+    allFrames = os.listdir(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES_CLEAN)
+    allFrames.sort()
+    video.setNbFrames(len(allFrames))
+    video.setFrames(allFrames)
+
 
 def processOCR(video):
     if os.path.exists(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES):
@@ -162,7 +186,7 @@ def processOCR(video):
         startDialogueTime = 0
         endDialogueTime = 0
         it = 0
-        checkExtractedFile(video) #not the clean one (need to be redone)
+        checkExtractedFileCleaned(video) #not the clean one (need to be redone)
         for i in range (video.getNbFrames()):
             dialogue = pytesseract.image_to_string(Image.open(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES_CLEAN + '/' + video.getFrames()[i]), config=r'--oem 3 --psm 6', lang= HARDSUB_LANGUAGE)
             print(dialogue)
@@ -170,7 +194,10 @@ def processOCR(video):
                 endDialogueTime = imagePerTime(video.getFPS(), i+1)
             else:
                 it += 1
-                startDialogueTime = imagePerTime(video.getFPS(), i+1)
+                startDialogueTime = imagePerTime(video.getFPS(), float(video.getFrames()[i].rsplit('.', 1)[0]))
+                endDialogueTime = startDialogueTime + 1
+                print(startDialogueTime)
+                print(video.getFrames()[i].rsplit('.', 1)[0])
                 previousDialogue = dialogue
                 srtSave({'dialogue': dialogue, 'startDialogueTime': startDialogueTime, 'endDialogueTime':endDialogueTime}, it)
             allDialogueTime.append({'dialogue': dialogue, 'startDialogueTime': startDialogueTime, 'endDialogueTime':endDialogueTime})
@@ -193,9 +220,9 @@ def frameCleaning(videoWorkingDir, frame, numFrame):
     frame[np.all(frame >= (255, 254, 255), axis=-1)] = (255,255,255)
     frame[np.all(frame >= (255, 255, 254), axis=-1)] = (255,255,255)
     #frame[np.all(frame >= (100, 100, 100), axis=-1)] = (255,255,255)
-    frame[np.all(frame >= (70, 0, 0), axis=-1)] = (255,255,255)
-    frame[np.all(frame >= (0, 0, 70), axis=-1)] = (255,255,255)
-    frame[np.all(frame >= (0, 70, 0), axis=-1)] = (255,255,255)
+    frame[np.all(frame >= (60, 0, 0), axis=-1)] = (255,255,255)
+    frame[np.all(frame >= (0, 0, 60), axis=-1)] = (255,255,255)
+    frame[np.all(frame >= (0, 60, 0), axis=-1)] = (255,255,255)
     cv2.imwrite(videoWorkingDir + '/' + OUT_EXTRACT_IMAGES_CLEAN + '/' + str(numFrame), frame)
 
 def apply_brightness_contrast(input_img, brightness = 0, contrast = 0):
@@ -218,8 +245,6 @@ def apply_brightness_contrast(input_img, brightness = 0, contrast = 0):
         buf = cv2.addWeighted(buf, alpha_c, buf, 0, gamma_c)
     return buf
 
-    
-#frameCleaning(video.getWorkDir(), Image.open(video.getWorkDir() + '/' + OUT_EXTRACT_IMAGES + '/' + video.getFrames()[i]), video.getFrames()[i])
 
 def framesCleaning(video):
     checkExtractedFile(video)
